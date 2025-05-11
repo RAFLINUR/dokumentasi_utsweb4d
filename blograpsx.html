@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dokumentasi Laravel CRUD Produk dengan FluxUI</title>
+  <link href="https://cdn.jsdelivr.net/npm/@fluxui/core@latest/dist/fluxui.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #2c3e50;
+      color: white;
+      margin-top: 60px;
+    }
+
+    .dropdown {
+      margin-bottom: 20px;
+    }
+
+    .dropdown-button {
+      background-color: #3498db;
+      color: white;
+      padding: 15px;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .dropdown-button:hover {
+      background-color: #2980b9;
+    }
+
+    .dropdown-content {
+      display: none;
+      padding: 15px;
+      border-left: 4px solid #3498db;
+      background-color: #ecf0f1;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    pre {
+      background-color: #fff;
+      padding: 10px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Dokumentasi Proyek Laravel CRUD Produk dengan FluxUI</h1>
+  </header>
+
+  <main>
+
+    <div class="dropdown">
+      <button class="dropdown-button" onclick="toggleDropdown('content1')">Langkah 1: Pembuatan Tabel Database (Migration)</button>
+      <div id="content1" class="dropdown-content">
+        <p>Perintah untuk membuat migration tabel:</p>
+        <pre><code>php artisan make:migration create_customers_table
+php artisan make:migration create_orders_table
+php artisan make:migration create_order_details_table
+php artisan make:migration create_products_table</code></pre>
+        <p>Struktur tabel di migration:</p>
+        <pre><code>Schema::create('products', function (Blueprint $table) {
+  $table->id();
+  $table->string('name');
+  $table->decimal('price', 10, 2);
+  $table->unsignedBigInteger('category_id')->nullable();
+  $table->timestamps();
+
+  $table->foreign('category_id')->references('id')->on('product_categories')->onDelete('set null');
+});</code></pre>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button class="dropdown-button" onclick="toggleDropdown('content2')">Langkah 2: Pembuatan CRUD Produk</button>
+      <div id="content2" class="dropdown-content">
+        <p>Gunakan FluxUI untuk membangun UI CRUD produk:</p>
+        <p>Install terlebih dahulu FluxUI menggunakan CDN di bagian `<head>`:</p>
+        <pre><code>&lt;link href="https://cdn.jsdelivr.net/npm/@fluxui/core@latest/dist/fluxui.min.css" rel="stylesheet"&gt;</code></pre>
+        <p>Buat controller dengan perintah:</p>
+        <pre><code>php artisan make:controller ProductController</code></pre>
+        <p>Gunakan resource route di `web.php`:</p>
+        <pre><code>Route::resource('/dashboard/products', ProductController::class);</code></pre>
+        <p>Di dalam controller, tambahkan logika untuk CRUD (create, read, update, delete).</p>
+
+        <p>Views yang digunakan:</p>
+        <ul>
+          <li>index.blade.php</li>
+          <li>product_create.blade.php</li>
+          <li>product_edit.blade.php</li>
+        </ul>
+
+        <p>Contoh kode untuk membuat tabel produk menggunakan FluxUI:</p>
+        <pre><code>&lt;flux-table :data="$products"&gt;
+    &lt;flux-column field="name" label="Nama Produk" /&gt;
+    &lt;flux-column field="price" label="Harga" /&gt;
+    &lt;flux-column label="Aksi"&gt;
+      &lt;flux-button @click="editProduct"&gt;Edit&lt;/flux-button&gt;
+      &lt;flux-button @click="deleteProduct"&gt;Hapus&lt;/flux-button&gt;
+    &lt;/flux-column&gt;
+&lt;/flux-table&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button class="dropdown-button" onclick="toggleDropdown('content3')">Langkah 3: Validasi Input</button>
+      <div id="content3" class="dropdown-content">
+        <p>Gunakan validasi input Laravel di controller:</p>
+        <pre><code>        $validator = \Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'price' => 'required|string|max:255',
+            'category' => 'required'
+        ]);</code></pre>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button class="dropdown-button" onclick="toggleDropdown('content4')">Langkah 4: Contoh Tampilan Antarmuka</button>
+      <div id="content4" class="dropdown-content">
+        <p><strong>Form Tambah Produk dengan FluxUI</strong></p>
+        <pre><code>&lt;flux-form action="{{ route('products.store') }}" method="POST"&gt;
+  @csrf
+  &lt;flux-input label="Nama Produk" name="name" required /&gt;
+  &lt;flux-input label="Harga Produk" name="price" type="number" required /&gt;
+  &lt;flux-button type="submit"&gt;Simpan Produk&lt;/flux-button&gt;
+&lt;/flux-form&gt;</code></pre>
+
+        <p><strong>Daftar Produk dengan FluxUI</strong></p>
+        <pre><code>&lt;flux-table :data="$products"&gt;
+  &lt;flux-column field="name" label="Nama Produk" /&gt;
+  &lt;flux-column field="price" label="Harga" /&gt;
+  &lt;flux-column label="Aksi"&gt;
+    &lt;flux-button @click="editProduct"&gt;Edit&lt;/flux-button&gt;
+    &lt;flux-button @click="deleteProduct"&gt;Hapus&lt;/flux-button&gt;
+  &lt;/flux-column&gt;
+&lt;/flux-table&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button class="dropdown-button" onclick="toggleDropdown('content5')">Penutup</button>
+      <div id="content5" class="dropdown-content">
+        <p>Dokumentasi ini mencakup pembuatan tabel database menggunakan migration, implementasi CRUD, dan penggunaan FluxUI untuk membangun antarmuka pengguna di Laravel.</p>
+        <p><strong>Disusun oleh:</strong> Rafli Nur Ikhwan Abdilah</p>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    &copy; 2025 | Dokumentasi by Rafli Nur Ikhwan Abdilah
+  </footer>
+
+  <script>
+    function toggleDropdown(id) {
+      const content = document.getElementById(id);
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    }
+  </script>
+
+</body>
+</html>
